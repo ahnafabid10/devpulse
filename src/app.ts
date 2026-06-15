@@ -1,5 +1,5 @@
 import express, { type Application, type Request, type Response } from 'express';
-import { Pool } from "pg";
+import { userRouter } from './modules/user/user.route';
 
 const app: Application = express();
 
@@ -19,6 +19,6 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 
-app.post('/', )
+app.use('/api/users', userRouter)
 
 export default app

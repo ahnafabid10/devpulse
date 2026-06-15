@@ -1,15 +1,8 @@
-import { Pool } from "pg"
+import { Router } from "express"
+import { userController } from "./user.controller"
 
-const createUser = async(req: Request, res: Response) =>{
+const router = Router()
 
-  
+router.post('/', userController.createUser)
 
-  res.status(200).json({
-    massage : "Post Created Successful",
-    data: {name, email, password, role}
-  })
-}
-
-export default userController = {
-    createUser,
-}
+export const userRouter = router
