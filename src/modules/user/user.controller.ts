@@ -1,9 +1,28 @@
-const createUserIntoDB = async(  )=>{
-      const {name, email, password, role} = req.body
+import type { Request, Response } from "express"
+import { pool } from "../../DB"
+import type { IUser } from "./user.interface"
+import { userService } from "./user.service"
 
-  const result = await Pool.query(`
-    INSERT INTO users(name, email, password, role) VALUES($1,$2,$3,$4) RETURNING *
-    `, [name, email, password, role])
+const createUser = async(req: Request, res: Response)=>{
+     try {
+        const result = await userService.createUserIntoDb(req.body)
 
-    console.log(result)
+        res.status(201).json({
+            success: true,
+            massage: "user created Successfully",
+            data: result.rows[0]
+        })
+
+     } catch (error) {
+    res.status(500).json({
+      success: false,
+    //   message: error.message,
+      error: error,
+    });
+     }
+}
+
+export const userController = {
+    createUser,
+    
 }
