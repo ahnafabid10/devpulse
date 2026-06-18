@@ -1,6 +1,5 @@
 import type { Request, Response } from "express"
 import { pool } from "../../DB"
-import type { IUser } from "./user.interface"
 import { userService } from "./user.service"
 
 const createUser = async(req: Request, res: Response)=>{
@@ -22,7 +21,24 @@ const createUser = async(req: Request, res: Response)=>{
      }
 }
 
+const getAllUsers = async (req: Request, res: Response) =>{
+  try {
+    const result = await userService.getAllUsersFromDb()
+    res.status(200).json({
+      success: true,
+      massage: "users retrived Successfully",
+      data: result.rows,
+    })
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+}
+
 export const userController = {
     createUser,
-    
+    getAllUsers,
 }
