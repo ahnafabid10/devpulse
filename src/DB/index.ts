@@ -2,12 +2,12 @@ import { Pool } from "pg";
 import config from "../config";
 
 export const pool = new Pool({
-  connectionString: config.connect_string
+    connectionString: config.connect_string
 })
 
-export const initDB = async()=>{
+export const initDB = async () => {
     try {
-        pool.query(`
+        await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(30),
@@ -20,7 +20,27 @@ export const initDB = async()=>{
     updated_at TIMESTAMP DEFAULT NOW()
 );
             `)
+
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS issues(
+            id SERIAL PRIMARY KEY,
+            reporter_id INT UNIQUE users(id) ON  DELETE CASCADE,
+            title VARCHAR(150),
+            description TEXT NOT NULL CHECK  (char_length(description) >= 20),
+            type TEXT,
+            status TEXT,
+
+            created_at TIMESTAMP DEFAULT NOW(),
+            updated_at TIMESTAMP DEFAULT NOW()
+           )
+            `)
+
+
     } catch (error) {
         console.log(error)
     }
+
+
+
 }
