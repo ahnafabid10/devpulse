@@ -1,4 +1,3 @@
-import type { Request, Response } from "express";
 import type { IIssue } from "./issue.interface";
 import { pool } from "../../DB";
 
