@@ -42,7 +42,6 @@ const getSingleUser = async (req: Request, res: Response) => {
   try {
     const result = await userService.getSingleUserDb(id as string)
 
-    if (result.rows.length === 0) {
       if (result.rows.length === 0) {
         res.status(404).json({
           success: false,
@@ -50,7 +49,6 @@ const getSingleUser = async (req: Request, res: Response) => {
           data: {},
         })
       }
-    }
 
   } catch (error: any) {
     res.status(500).json({
