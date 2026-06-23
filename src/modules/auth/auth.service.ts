@@ -36,7 +36,7 @@ const loginUserFromDb= async (payload: {email: string, password: string})=>{
 
 
             return {
-        token: accessToken,
+        token: accessToken, refreshToken,
         user: {
             id: user.id,
             name: user.name,

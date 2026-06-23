@@ -2,19 +2,20 @@ import type { IIssue } from "./issue.interface";
 import { pool } from "../../DB";
 
 const createIssueIntoDb = async (payload: IIssue) => {
-    const { title, description, type, status, reporter_id } = payload
+    const { title, description, type, reporter_id } = payload
+    const status = payload.status || "open"
 
-    const result =await pool.query(`
-        INSERT INTO issues( title, description, type, status, reporter_id) VALUES ($1, $2, $3, $4,$5,) RETURNING *
+    const result = await pool.query(`
+        INSERT INTO issues( title, description, type, status, reporter_id) VALUES ($1, $2, $3, $4, $5) RETURNING *
         `, [ title, description, type, status, reporter_id])
     
-        return result    
+    return result    
 }
 
-const getAllIssueIntoDb = async(id: string)=>{
+const getAllIssueIntoDb = async () => {
     const result = await pool.query(`
         SELECT * FROM issues
-        ` , [id] )
+        `)
 
     return result
 }

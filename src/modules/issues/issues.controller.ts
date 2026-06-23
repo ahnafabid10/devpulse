@@ -4,18 +4,35 @@ import { issueService } from "./issue.service";
 
 const createIssue = async(req: Request, res: Response )=>{
     try {
-        const result = await issueService.createIssueIntoDb(req.body)
+        const { title, description, type } = req.body
+        const reporter_id = typeof req.user?.id === "string" ? Number(req.user.id) : req.user?.id
+
+        if (!reporter_id) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized access",
+                data: {},
+            })
+        }
+
+        const result = await issueService.createIssueIntoDb({
+            title,
+            description,
+            type,
+            status: "open",
+            reporter_id,
+        })
+
         res.status(201).json({
-      success: true,
-      massage: "Issue created Successfully",
-      data: result.rows[0]
-    })
+            success: true,
+            message: "Issue created successfully",
+            data: result.rows[0],
+        })
     } catch (error) {
         res.status(500).json({
-      success: false,
-      //   message: error.message,
-      error: error,
-    });
+            success: false,
+            error: error,
+        })
     }
 }
 
