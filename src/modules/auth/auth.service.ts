@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
 import { pool } from "../../DB";
 import bcrypt from "bcryptjs";
-import jwt from 'jsonwebtoken';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
 import config from "../../config";
 
-const loginUser= async (payload: {email: string, password: string})=>{
+const loginUserFromDb= async (payload: {email: string, password: string})=>{
     const {email, password} = payload
     const userData = await pool.query(`
         SELECT * FROM users WHERE EMAIL =$1
@@ -34,4 +34,39 @@ const loginUser= async (payload: {email: string, password: string})=>{
 
         return {accessToken, refreshToken}
 
+}
+
+const generateRefreshToken =async(token: string)=>{
+    if(!token){
+        throw new Error("unathorized")
+    }
+    const decoded = jwt.verify(token as string, config.secret as string) as JwtPayload
+    console.log(decoded)
+
+    const userData = await pool.query(`
+        SELECT * FROM users WHERE EMAIL =$1
+        `, [decoded.email])
+
+    const user = userData.rows[0]
+
+    if(userData.rows.length ===0){
+        throw new Error ("user not found")
+    }
+
+    const jwtPayload= {
+            id: user.id,
+            name: user.name,
+            role: user.role,
+            email: user.email
+        }
+
+    const accessToken  = jwt.sign(jwtPayload, config.refresh_secret as string, {expiresIn: "1d"})
+
+    return accessToken
+
+}
+
+export const authService = {
+    loginUserFromDb,
+    generateRefreshToken
 }

@@ -3,7 +3,7 @@ import { userController } from "./user.controller"
 
 const router = Router()
 
-router.post('/', userController.createUser)
+router.post('/api/auth/signup', userController.createUser)
 
 router.get('/', userController.getAllUsers)
 
