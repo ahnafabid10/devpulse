@@ -22,6 +22,6 @@ app.get('/', (req: Request, res: Response) => {
 
 
 app.use('/api/auth', userRouter)
-app.use('/api/issue', issueRouter)
+app.use('/api/issues', issueRouter)
 app.use('/api/auth', authRouter)
 export default app

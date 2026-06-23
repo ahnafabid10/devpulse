@@ -2,11 +2,11 @@ import type { IIssue } from "./issue.interface";
 import { pool } from "../../DB";
 
 const createIssueIntoDb = async (payload: IIssue) => {
-    const { id, title, description, type, status, reporter_id } = payload
+    const { title, description, type, status, reporter_id } = payload
 
     const result =await pool.query(`
-        INSERT INTO issues(id, title, description, type, status, reporter_id) VALUES ($1, $2, $3, $4,$5, $6) *RETURNING
-        `, [id, title, description, type, status, reporter_id])
+        INSERT INTO issues( title, description, type, status, reporter_id) VALUES ($1, $2, $3, $4,$5,) RETURNING *
+        `, [ title, description, type, status, reporter_id])
     
         return result    
 }
