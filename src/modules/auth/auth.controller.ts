@@ -8,7 +8,7 @@ const loginUser = async (req: Request, res: Response) => {
         const { refreshToken } = result
 
         res.cookie("refreshToken", refreshToken), {
-            secure: false, // in prod true
+            secure: false,
             httpOnly: true,
             sameSite: "lax"
         }
@@ -16,7 +16,7 @@ const loginUser = async (req: Request, res: Response) => {
             statusCode: 201,
             success: true,
             message: "Profile created successfully!",
-            data: result,
+            data: result, 
         })
     } catch (error: any) {
         sendResponse(res, {
