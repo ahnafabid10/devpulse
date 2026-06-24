@@ -12,11 +12,29 @@ const createIssueIntoDb = async (payload: IIssue) => {
     return result    
 }
 
-const getAllIssueIntoDb = async () => {
-    const result = await pool.query(`
-        SELECT * FROM issues
-        `)
+const getAllIssueIntoDb = async (filters?: { sort?: string; type?: string; status?: string }) => {
+    let query = `SELECT * FROM issues`
+    const conditions: string[] = []
+    const values: (string | number)[] = []
 
+    if (filters?.type) {
+        values.push(filters.type)
+        conditions.push(`type = $${values.length}`)
+    }
+
+    if (filters?.status) {
+        values.push(filters.status)
+        conditions.push(`status = $${values.length}`)
+    }
+
+    if (conditions.length) {
+        query += ` WHERE ${conditions.join(" AND ")}`
+    }
+
+    const order = filters?.sort === "oldest" ? "ASC" : "DESC"
+    query += ` ORDER BY created_at ${order}`
+
+    const result = await pool.query(query, values)
     return result
 }
 

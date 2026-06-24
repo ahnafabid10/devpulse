@@ -37,6 +37,15 @@ const getSingleUserDb = async (id: string) => {
   return result
 }
 
+const getUsersByIds = async (ids: Array<string | number>) => {
+  const result = await pool.query(`
+    SELECT id, name, role FROM users WHERE id = ANY($1)
+    `, [ids]
+  )
+
+  return result
+}
+
 const updateUserFromDb = async (payload : IUser ,id: string) => {
 
   const {name,password, is_active, role} = payload
@@ -69,6 +78,7 @@ export const userService = {
   createUserIntoDb,
   getAllUsersFromDb,
   getSingleUserDb,
+  getUsersByIds,
   updateUserFromDb,
   deleteUserFromDb
 

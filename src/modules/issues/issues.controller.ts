@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { IIssueResponse } from "./issue.interface";
 import { issueService } from "./issue.service";
+import { userService } from "../user/user.service";
 
 
 const createIssue = async(req: Request, res: Response )=>{
@@ -40,16 +41,54 @@ const createIssue = async(req: Request, res: Response )=>{
 
 const getAllIssue = async(req: Request, res: Response)=>{
     try {
-        const result = await issueService.getAllIssueIntoDb()
-        res.status(201).json({
+        const { sort = "newest", type, status } = req.query as {
+            sort?: string
+            type?: string
+            status?: string
+        }
+
+        const filters: { sort?: string; type?: string; status?: string } = {
+            sort: sort === "oldest" ? "oldest" : "newest",
+        }
+
+        if (type) filters.type = type
+        if (status) filters.status = status
+
+        const result = await issueService.getAllIssueIntoDb(filters)
+        const issues = result.rows
+        const reporterIds = [...new Set(issues.map((issue) => issue.reporter_id).filter(Boolean))]
+
+        let reporters: { id: number; name: string; role: string }[] = []
+        if (reporterIds.length > 0) {
+            const usersResult = await userService.getUsersByIds(reporterIds)
+            reporters = usersResult.rows
+        }
+
+        const formattedIssues: IIssueResponse[] = issues.map((row) => ({
+            id: row.id,
+            title: row.title,
+            description: row.description,
+            type: row.type,
+            status: row.status,
+            reporter:
+                reporters.find((reporter) => reporter.id === row.reporter_id) ?? {
+                    id: row.reporter_id,
+                    name: "Unknown",
+                    role: "user",
+                },
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+        }))
+
+        res.status(200).json({
             success: true,
-            massage: "issue retrived Successfully",
-            data: result.rows[0]
+            message: "Issues retrieved successfully",
+            data: formattedIssues,
         })
     } catch (error) {
         res.status(500).json({
             success: false,
-            error: error
+            error: error,
         })
     }
 }
