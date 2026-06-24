@@ -89,7 +89,7 @@ const generateRefreshToken =async(token: string)=>{
             email: user.email
         }
 
-    const accessToken  = jwt.sign(jwtPayload, config.refresh_secret as string, {expiresIn: "1d"})
+    const accessToken  = jwt.sign(jwtPayload, config.secret as string, {expiresIn: "1d"})
 
     return accessToken
 

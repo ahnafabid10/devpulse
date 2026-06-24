@@ -22,7 +22,20 @@ const getAllIssueIntoDb = async () => {
 
 const getSingleIssueIntoDB =async(id: string)=>{
     const result = await pool.query(`
-        SELECT * FROM issues WHERE id = $1
+        SELECT 
+            issues.id,
+            issues.title,
+            issues.description,
+            issues.type,
+            issues.status,
+            issues.created_at,
+            issues.updated_at,
+            users.id as reporter_id,
+            users.name as reporter_name,
+            users.role as reporter_role
+        FROM issues
+        LEFT JOIN users ON issues.reporter_id = users.id
+        WHERE issues.id = $1
         `, [id])
     return result
 }

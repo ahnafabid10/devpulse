@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import type { IIssueResponse } from "./issue.interface";
 import { issueService } from "./issue.service";
 
 
@@ -21,7 +22,7 @@ const createIssue = async(req: Request, res: Response )=>{
             description,
             type,
             status: "open",
-            reporter_id,
+            reporter_id
         })
 
         res.status(201).json({
@@ -58,16 +59,38 @@ const getSingleIssue = async(req: Request, res: Response)=>{
     try {
         const result = await issueService.getSingleIssueIntoDB(id as string)
         if(result.rows.length === 0){
-            res.status(404).json({
-            success: true,
-            massage: "User not found",
+            return res.status(404).json({
+            success: false,
+            message: "Issue not found",
             data: {}
         })
         }
+
+        const row = result.rows[0]
+        const issueResponse: IIssueResponse = {
+            id: row.id,
+            title: row.title,
+            description: row.description,
+            type: row.type,
+            status: row.status,
+            reporter: {
+                id: row.reporter_id,
+                name: row.reporter_name,
+                role: row.reporter_role,
+            },
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Issue retrieved successfully",
+            data: issueResponse
+        })
     } catch (error : any) {
        res.status(500).json({
         success: false,
-        massage: error.massage,
+        message: error.message,
         error: error
        }) 
     }

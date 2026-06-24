@@ -24,11 +24,11 @@ const loginUser = async (req: Request, res: Response) => {
         const result = await authService.loginUserFromDb(req.body)
         const { refreshToken } = result
 
-        res.cookie("refreshToken", refreshToken), {
+        res.cookie("refreshToken", refreshToken, {
             secure: false,
             httpOnly: true,
             sameSite: "lax"
-        }
+        })
         sendResponse(res, {
             statusCode: 201,
             success: true,
