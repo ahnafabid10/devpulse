@@ -2,6 +2,23 @@ import type { Request, Response } from "express";
 import { authService } from "./auth.service";
 import sendResponse from "../../utility/sendResponse";
 
+const signUpUser = async(req: Request, res: Response)=>{
+    try {
+        const result = await authService.signupUserFromDB(req.body)
+        res.status(201).json({
+      success: true,
+      massage: "user created Successfully",
+      data: result.rows[0]
+    })
+    } catch (error) {
+        res.status(500).json({
+      success: false,
+      //   message: error.message,
+      error: error,
+    });
+    }
+}
+
 const loginUser = async (req: Request, res: Response) => {
     try {
         const result = await authService.loginUserFromDb(req.body)
@@ -57,5 +74,6 @@ const refreshToken = async (req: Request, res: Response) => {
 
 export const authController = {
     loginUser,
-    refreshToken
+    refreshToken,
+    signUpUser
 }

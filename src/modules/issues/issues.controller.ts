@@ -5,15 +5,16 @@ import { issueService } from "./issue.service";
 const createIssue = async(req: Request, res: Response )=>{
     try {
         const { title, description, type } = req.body
-        const reporter_id = typeof req.user?.id === "string" ? Number(req.user.id) : req.user?.id
 
-        if (!reporter_id) {
+        if (req.user?.role !== "contributor" && req.user?.role !== "maintainer") {
             return res.status(401).json({
                 success: false,
                 message: "Unauthorized access",
                 data: {},
             })
         }
+
+        const reporter_id = req.user.id
 
         const result = await issueService.createIssueIntoDb({
             title,

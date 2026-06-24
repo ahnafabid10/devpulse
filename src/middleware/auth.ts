@@ -7,18 +7,20 @@ import config from "../config";
 const auth = (...roles: ROLES[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const token = req.headers.authorization;
-
-      if (!token) {
+     const authHeader = req.headers.authorization;
+      
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({
           success: false,
-          message: "Unauthorized access!",
+          message: "No token provided!",
           data: {},
         });
       }
 
+      const token = authHeader.split(' ')[1];
+
       const decoded = jwt.verify(
-        token,
+        token as string,
         config.secret as string
       ) as JwtPayload;
 

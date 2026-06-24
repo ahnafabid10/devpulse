@@ -4,6 +4,22 @@ import bcrypt from "bcryptjs";
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import config from "../../config";
 
+const signupUserFromDB = async (payload: {name: string, email: string, password: string, role: string}) => {
+  const { name, email, password, role } = payload;
+
+  const hashPassword = await bcrypt.hash(password, 10)
+
+  const result = await pool.query(`
+        INSERT INTO users(name, email, password, role) VALUES($1,$2,$3,$4) RETURNING *
+        `, [name, email, hashPassword, role])
+
+  console.log(result)
+
+  delete result.rows[0].password
+
+  return result
+};
+
 const loginUserFromDb= async (payload: {email: string, password: string})=>{
     const {email, password} = payload
     const userData = await pool.query(`
@@ -81,5 +97,6 @@ const generateRefreshToken =async(token: string)=>{
 
 export const authService = {
     loginUserFromDb,
-    generateRefreshToken
+    generateRefreshToken,
+    signupUserFromDB
 }

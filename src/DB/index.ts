@@ -25,7 +25,7 @@ export const initDB = async () => {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS issues(
             id SERIAL PRIMARY KEY,
-              reporter_id INT REFERENCES users(id) ON DELETE CASCADE,
+            reporter_id INTEGER NOT NULL,
             title VARCHAR(150),
             description TEXT NOT NULL CHECK  (char_length(description) >= 20),
             type TEXT,
