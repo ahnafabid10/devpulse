@@ -96,29 +96,42 @@ const getSingleIssue = async(req: Request, res: Response)=>{
     }
 }
 
-const updateIssue = async(req:Request, res: Response)=>{
+const updateIssue = async(req: Request, res: Response)=>{
     const {id} = req.params
-    try {
-        const result = await issueService.updateIssueIntoDB(id as string)
+    const { title, description, type, status } = req.body
 
-        if(result.rows.length === 0){
-            res.status(404).json({
+    try {
+        const existingIssue = await issueService.getSingleIssueIntoDB(id as string)
+        if(existingIssue.rows.length === 0){
+            return res.status(404).json({
                 success: false,
-                massage: "Issue Not Found"
+                message: "Issue Not Found"
             })
         }
 
-        res.send(201).json({
+        const issue = existingIssue.rows[0]
+        const userId = req.user?.id
+
+        if(req.user?.role === "contributor" && (issue.reporter_id !== userId || issue.status !== "open")){
+            return res.status(403).json({
+                success: false,
+                message: "You can only update your own open issues"
+            })
+        }
+
+        const result = await issueService.updateIssueIntoDB({title,description,type,status,id: id as string })
+
+        res.status(200).json({
             success: true,
-            massage: "Issue Updated Successfully",
+            message: "Issue updated successfully",
             data: result.rows[0]
         })
 
     } catch (error : any) {
         res.status(500).json({
             success: false,
-            massage: error.massage,
-            data: error
+            message: error.message,
+            error: error
         })
     }
 }

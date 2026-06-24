@@ -40,16 +40,18 @@ const getSingleIssueIntoDB =async(id: string)=>{
     return result
 }
 
-const updateIssueIntoDB =async(id: string)=>{
+const updateIssueIntoDB =async(payload: { title?: string; description?: string; type?: string; status?: string; id: string | number })=>{
+    const { title, description, type, status, id } = payload
     const result = await pool.query(`
         UPDATE issues
-        SET title = COALESCE($1,name),
+        SET title = COALESCE($1, title),
         description = COALESCE($2, description),
         type = COALESCE($3, type),
         status = COALESCE($4, status),
-
+        updated_at = NOW()
+        WHERE id = $5
         RETURNING *
-        `, [id])
+        `, [title, description, type, status, id])
 
         return result
 }
