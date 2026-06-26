@@ -7,7 +7,7 @@ const createUser = async (req: Request, res: Response) => {
 
     res.status(201).json({
       success: true,
-      massage: "user created Successfully",
+      massage: "User created Successfully",
       data: result.rows[0]
     })
 

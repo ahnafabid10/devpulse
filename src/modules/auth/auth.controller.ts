@@ -7,7 +7,7 @@ const signUpUser = async(req: Request, res: Response)=>{
         const result = await authService.signupUserFromDB(req.body)
         res.status(201).json({
       success: true,
-      massage: "user created Successfully",
+      massage: "User created Successfully",
       data: result.rows[0]
     })
     } catch (error) {
